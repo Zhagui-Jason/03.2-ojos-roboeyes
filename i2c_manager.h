@@ -16,6 +16,8 @@
 // Pista: Los valores viven en config.h; el resultado esperado se describe en la guía §05.
 inline void initI2C() {
     /* ESCRIBE TU CÓDIGO AQUÍ */
+    Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN );
+    Wire.setClock(I2C_FREQUENCY_HZ);
 }
 
 // TODO 1.2: Barre el rango completo de direcciones e informa cada dispositivo hallado y el conteo final.
@@ -23,6 +25,21 @@ inline void initI2C() {
 // Pista: La guía §05 muestra el barrido esperado línea por línea.
 inline void scanI2C() {
     /* ESCRIBE TU CÓDIGO AQUÍ */
+    byte error, address;
+    int cont = 0;
+    for (address = 1; address < 127; address++ ){
+        Wire.beginTransmission(address);
+        error = Wire.endTransmission();
+        if (error == 0) {
+            Serial.print("I2C El dispositivo fue encontrado en la direccion");
+            if (address<16) Serial.print("0");
+            Serial.print(address,HEX);
+            Serial.println("  !");
+            cont++; 
+        }
+    }
+    Serial.print("Total de dispositivos encontrados: ");
+    Serial.println(cont);
 }
 
 // TODO 1.3: Sondea la dirección del panel e informa si responde o si el arranque debe detenerse.
@@ -30,6 +47,14 @@ inline void scanI2C() {
 // Pista: Hay dos caminos, uno de éxito y uno fatal; la guía §05 los muestra.
 inline void testI2CDevice() {
     /* ESCRIBE TU CÓDIGO AQUÍ */
+    Wire.beginTransmission(OLED_I2C_ADDR);
+    byte error = Wire.endTransmission();
+    if (error == 0) {
+        Serial.println("I2C panel encontrado y respondiendo");
+    } else {
+        Serial.println("I2C panel no responde. Arranque detenido");
+        while (1);
+    }
 }
 
 #endif
